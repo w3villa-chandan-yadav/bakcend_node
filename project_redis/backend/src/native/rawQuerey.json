@@ -1,0 +1,5 @@
+{
+    "getAllUser":"SELECT * FROM Users;",
+    "getLatestEmail":"SELECT * FROM EmailVerifications e JOIN Users u  ON  e.UserId = u.id WHERE token = ? ORDER BY expiresAt DESC LIMIT 1;",
+    "getLatestOpt" : "SELECT * FROM  phoneverifications p JOIN Users u ON  p.UserId = u.id WHERE verificationCode = ? ORDER BY epxireAt DESC LIMIT 1"
+}

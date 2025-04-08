@@ -1,0 +1,344 @@
+redis practice
+
+/////-------------------------------------testing redis----------------------------------------////
+app.get("/",async (req,res)=>{
+    try {        
+        const lang =  ["java", "javaScript", "c++", "node js"]
+        const data = {
+            name: `chandan${Date.now()}`,
+            langugae: lang[Math.round(Math.random()*lang.length)]
+        }
+        await client.lPush("submission", JSON.stringify(data));
+        res.status(200).json({
+            success: true,
+            message: "push in redis"
+        })
+    } catch (error) {
+        console.log("error in / get");
+        throw new Error("error in / get")
+    }
+})
+
+
+app.post("/activities", async (req,res)=>{
+    try {
+
+        const {userId , activity}  =  req.body ;
+
+        const activityKey = `activities${userId}`;
+
+      const newActivity =   await client.lPush(activityKey, activity);
+
+        // console.log("activity added",newActivity) ;
+
+        res.status(200).json({
+            success: true,
+            message: "activity added :"
+        })
+        
+    } catch (error) {
+        console.log("error in the activities route");
+        throw new Error("Error in the activities routes")
+    }
+})
+
+
+app.get("/activites/:id", async (req,res)=>{
+    try {
+        
+        const  {id} = req.params ;
+        const activityKey = `activities${id}`;
+        const activies = await  client.lRange(activityKey,0,1);
+        res.status(200).json({
+            success:true,
+            message: "all actvities of this user",
+            work: activies
+        })
+    } catch (error) {
+        console.log("this is error in the activies",error);
+        throw new Error("Error in the activites route");
+    }
+})
+
+
+app.post("/likePost", async (req,res)=>{
+    try {
+
+        const {postId, userId} =  req.body;
+        
+        const postKey = `post${postId}:likes`;
+
+        const result = await client.sAdd(postKey,userId);
+
+        if(result === 1){
+            console.log("user liked post successfully");
+        }else{
+            console.log("user already liked this post")
+        }
+
+        res.status(200).json({
+            success: true,
+            message: "use post"
+        })
+
+    } catch (error) {
+     console.log("error in the likepost", error);
+     throw new Error("error in the likepost route")   
+    }
+})
+
+
+app.get("/likesNumber/:postId", async (req,res)=>{
+    try {
+        
+        const {postId} = req.params;
+
+        console.log(postId)
+
+        const postKey = `post${postId}:likes`;
+
+        const result = await client.sCard(postKey);
+
+        console.log(result);
+
+        const member = await client.sMembers(postKey)
+
+
+        res.status(200).json({
+            success: true,
+            message: "fetch all the userId ",
+            users: result,
+            member: member
+        })
+
+    } catch (error) {
+        console.log("error in the likeNumber routes");
+        throw new Error("this error in likeNumber");
+    }
+})
+
+app.post("/hset", async (req,res)=>{
+    try {
+        const {userId ,name ,age , email} = req.body;
+
+        await client.hSet(email,"name",name,"age",age, "userId",userId),
+        // await client.hSet(email, "age",age);
+        // await client.hSet(email, "userId",userId);
+
+        console.log('the hset is created');
+
+        res.status(200).json({
+            success: true,
+            message: "the user's hset is created"
+        })
+
+ 
+
+    } catch (error) {
+        console.log("error in the hset route");
+        throw new Error("error in the hset route");
+    }
+})
+
+app.get("/hset/:key",async (req,res)=>{
+    try {
+        
+        const {key}  = req.params ;
+ 
+        console.log(key)
+
+        const result= await client.hGetAll(key)
+
+        console.log(result);
+
+        res.status(200).json({
+            success: true,
+            message: " all the hset",
+            result
+        })
+
+    } catch (error) {
+        console.log("error in the hset route",error);
+        throw new Error("error in the hset route")  
+    }
+})
+//////-------------end--------------//////
+
+
+
+
+
+
+
+
+
+
+
+
+await client.set("name","chandan kumar yadav");
+await client.get("name")
+
+await client.set("count",10);
+await client.incr("count");
+await client.get("count)
+
+await client.incrBy("count",5);
+
+
+await client.append("name"," yadav");
+await client.get("name")    // output chandan kumar yadav yadav
+
+await client.setEx("name",3600,"chandan kumar yadav") //expire in 1 hour
+
+await client.quit(); // close the redis connection 
+
+
+//list  it is like linked list , where you can add element to the front and end
+
+await client.lPush("fruite","apple");
+await client.lPush("fruite","banana");
+console.log("added fruits to list (left side): "banana","apple");
+
+
+await client.rPush("fruite","cherry");
+
+console.log("cherry added in the right side ");
+
+await client.lRange("fruite",0,-1); // this means all the element present in the list ["banana","apple","cherry"];
+
+await client.lPop("fruite");
+await client.rPop("fruite");
+
+await client.expire("fruite",10) // expire in 10 secondes
+await client.ttl("fruite") // it will return the amount of time which is remaning before it's expire
+
+await client.lLen("fruite");
+
+
+
+
+// hashes also known as hset 
+
+await client.hset("user:1","name":"chandan");
+await client.hset("user:1","age",24);
+await client.hGet("user:1","name");
+await client.hGetAll("user:1");
+await client.hIncrBy("user:1","age",2);
+await client.hGet("user:1","age")
+await client.hExists("user:1","email");
+await client.hDel("user:1","email");
+await client.hLen("user:1 ");
+
+
+
+//set in redis 
+
+await client.sAdd("fruit","apple");
+await client.sAdd("fruit","banana");
+await client.sAdd("fruit","cherry");
+await client.sAdd("fruit","apple");  // this entry will be ignored as dublicates
+
+
+await client.sMembers("fruit");
+await client.sIsMember("fruit","apple");
+await client.sRem("fruit");
+await client.sCard("fruit");
+await client.sPop("fruit"); // it will return the random data 
+
+
+
+
+//    ------------------   sorted sets (Zsets)
+
+use -- LearderBoards 
+       real-time analytics 
+       priority Queues 
+
+
+await client.zAdd("leaderBoard",{score:100,member:"chandan"});
+await client.zAdd("leaderBoard",{score: 130, member: "chandan2"});
+await client.zAdd("leaderBoard", {score: 80 , member: "chandan3"});
+
+console.log("member added to leaderboard : chandan(100),chandan2(130),chandan3(80));
+
+await client.zRange("leaderBoard",0,-1,{WITHSCORES: true}); // output - low to high-- ["chandan3","80","chandan2","100","chandan","130"]
+await client.zRevRange("leaderBoard",0,-1,{WITHSCORES: true}) ; // OUTPUT - high to low ["chandan2","130","chandan","100","chandan3","80"],
+
+await client.zIncrBy("leaderBoard",50,"chandan");
+
+await client.zRange("leaderBoard",0,-1,{WITHSCORES:true});
+
+await client.zRem("leaderBoard","chandan2");
+
+await client.zCard("leaderBoard") // number of count of the values
+
+
+
+
+
+
+
+
+let's dive into workers section mainly it work with brPop , blpop
+
+await client.brPop("submission",0); // in this we have to give a second argument that determin how much time it should wait 
+                                    0 indicate the infinite wating till 
+
+Redis can hold large amount of data and worker can work asynchronusly 
+
+
+
+
+
+publisher and subscriber in redis 
+
+await client.publish("chatRoom","hello world!");
+await client.publish("chatRoom","hello this is message");
+
+await client.publish("updates","breaking new: Redis 7 is realised");
+// ---- message is published 
+
+
+
+
+await client.subscrib("chatRoom",(message)=>{
+    console.log("hi this is new message",message)
+})
+
+
+await client.subscrib("updates", (message)=>{
+    console.log("recive new message in update",message)
+})
+
+
+
+
+
+
+
+
+
+
+// ---------- handle cors without using external library --------  ////
+
+
+const allowedOrigin = 'http://example.com'; // Or '*' for all origins
+
+// CORS handling middleware
+app.use((req, res, next) => {
+  // Handle preflight requests
+  if (req.method === 'OPTIONS') {
+    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    res.header('Access-Control-Max-Age', '3600'); // Cache preflight request for 1 hour
+    return res.status(204).end(); // No content, just the headers
+  }
+
+  // Handle CORS headers for actual requests
+  res.header('Access-Control-Allow-Origin', allowedOrigin); // Or use '*' for any origin
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.header('Access-Control-Allow-Credentials', 'true'); // If you need to allow credentials (cookies, etc.)
+
+  next(); // Pass control to the next middleware
+});
