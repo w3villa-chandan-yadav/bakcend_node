@@ -2,16 +2,15 @@ import nodemailer from "nodemailer";
 import dotenv from "dotenv";
 dotenv.config()
 
+
+
 const transponder = nodemailer.createTransport({
     service:"gmail",
     auth: {
        user: process.env.EMAIL,
        pass: process.env.EMAIL_PASSWORD 
     }
-})
-
-
-
+});
 const sendMailAuthentication = async(reciver , link ,subjects = "This is verification mail")=>{
        const mailOption ={
           from:process.env.EMAIL,
@@ -43,19 +42,15 @@ const sendMailAuthentication = async(reciver , link ,subjects = "This is verific
         </body>
         </html>
     `,
- }
-
+ } ;
     transponder.sendMail(mailOption,(err,info)=>{
-
+        
         if(err){
             console.log("error in nodemailer ",err)
             throw new Error("error in emailsender ")
-        }
-
+        };
         return info
-    })
-
-
+    });
 }
 
 

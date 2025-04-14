@@ -9,20 +9,29 @@ import { sendMailAuthentication } from "../config/nodemailer.js";
 import { getToken, hashToken } from "../config/createHash.js";
 import { EmailVerification } from "../models/emailLogin.model.js";
 import { PhoneVerification } from "../models/phoneNumberverification.model.js";
+import client from "../config/redisConnection.js";
+import { ApiError } from "../middelwares/error.middleware.js";
+import { ERRORSTACKS } from "../constant.js/error.constant.js";
 
 const signUp = async(req,res , next )=>{
     try {
         const {name, email, password } = req.body;
-        const isExistingUser = await User.findOne({where:{email: email}})
+
+        if(!name || ! email || !password ){
+            return  next(new ApiError(400, ERRORSTACKS.USERERROR.INSUFFIENTDATA))
+            
+        }
+
+        const isExistingUser = await User.findOne({ where: {email: email}})
         if(isExistingUser){
-            res.status(400).json({
-                success:"false",
-                message:"User already exist"
+           return  res.status(400).json({
+                success: "false",
+                message: "User already exist"
             })
         }
 
         const salt = await bcrypt.genSalt(10)
-        const newPassword = await bcrypt.hash(password,salt);
+        const newPassword = await bcrypt.hash(password, salt);
     
         const newUser = await User.create({
             userName: name,
@@ -32,12 +41,13 @@ const signUp = async(req,res , next )=>{
 
         console.log(newUser)
 
-        const token = await getToken();
+        const token =  getToken();
 
-        const getHastoken = await hashToken(token); 
+        const getHastoken =  hashToken(token); 
         
 
         await sendMailAuthentication(email, `http://localhost:5173/emailverification/${token}`)
+
 
         const userId = newUser.dataValues.id ;
 
@@ -46,13 +56,16 @@ const signUp = async(req,res , next )=>{
           userId: userId,  
         })
 
+        await client.setEx(getHastoken, 300, "token")
+
         return res.status(200).json({
-            success:true,
-            message:"Email send successfuly"
+            success: true,
+            message: "Email send successfuly",
+            data: token
         })
     } catch (error) {
-        console.log("error in signup",error)
-        next(new Error("error in signup"))
+        console.log("error in signup", error)
+        next(new ApiError(404,"error in user model "))
     }
 }
 
@@ -60,21 +73,38 @@ const EmailVerificationcheck =async (req, res, next )=>{
     try {
         const { token } = req.body;
 
-        const gethashtoken = await hashToken(token);
+        if(!token){
+            return next(new ApiError(400, ERRORSTACKS.USERERROR.INSUFFIENTDATA))
+        }
+
+        const gethashtoken =  hashToken(token);
 
         console.log(gethashtoken)
 
-        const isUser = await nativeQuery(queryies.getLatestEmail,[gethashtoken])
+        const redisToken = await client.get(gethashtoken);
+
+        if(!redisToken){
+
+            res.status(200).json({
+                success: false,
+                message: "token expires",
+                data: []
+            })
+
+        }
+
+
+        const isUser = await nativeQuery(queryies.getLatestEmail,[ gethashtoken])
 
         if(isUser.length < 1){
             return res.status(400).json({
                 success: false,
                 message: "token expires",
-                data:[]
+                data: []
             })
         }
 
-        console.log(isUser[0].userId);
+        console.log( isUser[0].userId );
 
         // console.log(new Date(Date.now()))
         // console.log(new Date(isUser[0].expiresAt))
@@ -107,7 +137,7 @@ const EmailVerificationcheck =async (req, res, next )=>{
         })
 
     } catch (error) {
-        console.log("error in the Emailverificationcheck ",error);
+        console.log("error in the Emailverificationcheck", error);
           next( new Error("error in the Emailverificationchec"))
     }
 }
@@ -121,7 +151,7 @@ const PhoneNumberSmsVerification = async (req , res, next)=>{
 
         const { otp } = req.body ;
 
-        const result = await nativeQuery(queryies.getLatestOpt,[otp]);
+        const result = await nativeQuery(queryies.getLatestOpt, [otp]);
 
         if(result[0].length < 1){
             return res.status(400).json({
@@ -205,6 +235,7 @@ const phoneNumberVerification = async ( req , res , next )=>{
         userId: isUser.dataValues.id,
         verificationCode: Number(otp)
      })
+
 
 
         res.status(200).json({

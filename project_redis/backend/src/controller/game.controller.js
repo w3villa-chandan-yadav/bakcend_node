@@ -11,9 +11,7 @@ const initiallizeGame = async (gameId, playerId)=>{
         // console.log(playerData)
         const gameKey = `game${gameId}`
         const result = await client.hSet(gameKey, playerId, playerData);
-
         console.log(result)
-
         if(result ===1){
             return {
                 success: true,
@@ -30,28 +28,21 @@ const initiallizeGame = async (gameId, playerId)=>{
                 message: "Something went wrong"
             }
         }
-
-
-
     } catch (error) {
         console.log("error in redis initiallizegame",error)
     }
-}
-
+};
 
 const getPlayData  = async (gameId, playerId)=>{
     try {
         const gameKey = `game${gameId}`
         const result = await client.hGet(gameKey,playerId);
         const data = JSON.parse(result);
-
-        console.log(data)
-
-        return data ;
-
+        console.log(data);
+        return data 
     } catch (error) {
         console.log("error in redis getAll players")
-    }
+    };
 }
 
 const incrementInScores = async (gameId, playerId, response)=>{

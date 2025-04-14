@@ -1,0 +1,119 @@
+{
+  "data": {
+    "banners": [
+      {
+        "id": 1,
+        "image": "https://example.com/banner1.jpg",
+        "link": "/promotion1",
+        "alt_text": "Big Sale on Electronics",
+        "description": "Get up to 50% off on top electronics"
+      },
+      {
+        "id": 2,
+        "image": "https://example.com/banner2.jpg",
+        "link": "/promotion2",
+        "alt_text": "Summer Collection",
+        "description": "Shop the latest summer fashion collection now!"
+      }
+    ],
+    "featured_categories": [
+      {
+        "id": 1,
+        "name": "Electronics",
+        "image": "https://example.com/category-electronics.jpg",
+        "link": "/category/electronics"
+      },
+      {
+        "id": 2,
+        "name": "Fashion",
+        "image": "https://example.com/category-fashion.jpg",
+        "link": "/category/fashion"
+      },
+      {
+        "id": 3,
+        "name": "Home Appliances",
+        "image": "https://example.com/category-home-appliances.jpg",
+        "link": "/category/home-appliances"
+      }
+    ],
+    "best_selling_products": [
+      {
+        "id": 101,
+        "name": "Smartphone XYZ",
+        "image": "https://example.com/product1.jpg",
+        "price": 299.99,
+        "rating": 4.5,
+        "product_link": "/product/101",
+        "discount": "10%"
+      },
+      {
+        "id": 102,
+        "name": "Wireless Headphones ABC",
+        "image": "https://example.com/product2.jpg",
+        "price": 129.99,
+        "rating": 4.7,
+        "product_link": "/product/102",
+        "discount": "15%"
+      },
+      {
+        "id": 103,
+        "name": "Smart Watch 3.0",
+        "image": "https://example.com/product3.jpg",
+        "price": 199.99,
+        "rating": 4.3,
+        "product_link": "/product/103",
+        "discount": "5%"
+      }
+    ],
+    "new_arrivals": [
+      {
+        "id": 201,
+        "name": "New Arrival Laptop X",
+        "image": "https://example.com/product4.jpg",
+        "price": 899.99,
+        "rating": 4.6,
+        "product_link": "/product/201"
+      },
+      {
+        "id": 202,
+        "name": "Summer Dress Collection",
+        "image": "https://example.com/product5.jpg",
+        "price": 49.99,
+        "rating": 4.2,
+        "product_link": "/product/202"
+      }
+    ],
+    "promotions": [
+      {
+        "id": 1,
+        "title": "Free Shipping on Orders Over $50",
+        "description": "Enjoy free shipping on all orders above $50. Limited time only!",
+        "link": "/promo/free-shipping"
+      },
+      {
+        "id": 2,
+        "title": "Buy 1 Get 1 Free on Selected Items",
+        "description": "Hurry! Limited time offer on selected items.",
+        "link": "/promo/buy-1-get-1"
+      }
+    ],
+    "recommended_for_you": [
+      {
+        "id": 301,
+        "name": "Gaming Chair Pro",
+        "image": "https://example.com/product6.jpg",
+        "price": 159.99,
+        "rating": 4.8,
+        "product_link": "/product/301"
+      },
+      {
+        "id": 302,
+        "name": "Ergonomic Office Desk",
+        "image": "https://example.com/product7.jpg",
+        "price": 249.99,
+        "rating": 4.4,
+        "product_link": "/product/302"
+      }
+    ]
+  }
+}

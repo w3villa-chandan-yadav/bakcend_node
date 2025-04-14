@@ -186,7 +186,7 @@ await client.incrBy("count",5);
 
 
 await client.append("name"," yadav");
-await client.get("name")    // output chandan kumar yadav yadav
+await client.get("name");    // output chandan kumar yadav yadav
 
 await client.setEx("name",3600,"chandan kumar yadav") //expire in 1 hour
 

@@ -6,6 +6,9 @@ const client = createClient({
   password: 'qxhtxj5weqIeGUVRu8ompTFrGlsfdbCj'
 });
 
+
+// redis.cli -h redis-12251.c264.ap-south-1-1.ec2.redns.redis-cloud.com -p 12251   --  -- command to connect from termial 
+
 // username: 'default',
 // password: 'qxhtxj5weqIeGUVRu8ompTFrGlsfdbCj',
 // socket: {
