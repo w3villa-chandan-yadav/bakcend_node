@@ -253,7 +253,11 @@ try {
     const blogs = await postModel.findAll({
         include:[
             {model: userModel},
-            {model: likeModel},
+            {model: likeModel,
+                include:[{
+                    model: userModel
+                }]
+            },
             {model: commentModel}
         ],
         logging: console.log()

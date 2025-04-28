@@ -125,7 +125,7 @@ const formatted = `${date.getDate().toString().padStart(2, '0')}-${(date.getMont
 
   return (
     <div className="bg-white p-4 rounded-lg shadow space-y-2">
-      <h3 className={`text-lg font-bold flex justify-between ${blog?.user?.name === user?.name && "text-orange-500"}`}><span>{blog.title}</span> <div className="font-medium text-base"><span>{formatted}</span><span className="">
+      <h3 className={`text-lg font-bold flex justify-between ${blog?.user?.id === user?.id && "text-orange-500"}`}><span>{blog.title}</span> <div className="font-medium text-base"><span>{formatted}</span><span className="">
         {
           blog.userId === user.id && <MdDelete className="text-center mx-auto text-xl" onClick={handleDelete}/>
         }
