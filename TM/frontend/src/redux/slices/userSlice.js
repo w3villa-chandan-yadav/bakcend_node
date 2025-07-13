@@ -14,7 +14,6 @@ const userSlice = createSlice({
               state.userDetails = action.payload
         } ,
         logOut: (state)=>{
-            
             state.userDetails = null
         }
     }

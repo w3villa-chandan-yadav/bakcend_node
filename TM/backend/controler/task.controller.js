@@ -8,6 +8,7 @@ const { taskModle } = require("../modles/task.Models");
 const { userModel } = require("../modles/user.Models");
 const { NATIVEQUERIES } = require("../sequle/nativeQueries");
 const { rawSqlExecquation } = require("../sequle/rawSql");
+const { number } = require("joi");
 
 
 
@@ -369,8 +370,49 @@ const groupTasks = async (req, res, next)=>{
     }
 }
 
+const getSingleGroupTask = async (req, res, next)=>{
+    try {
+        const id = req.params.groupId ;
+        const groupId = Number(id)
+
+        console.log(groupId)
+
+        if(!groupId){
+            return next(new ApiError(401, USERERRORS.TASKS.ALLFIELDSREQUIRE))
+        }
+
+        const userId = req.user.id ;
+
+
+        const [isUserOfThisGroup] = await rawSqlExecquation(NATIVEQUERIES.ISMEMBEROFGROUPTOFETCH, [userId , groupId ])
+        
+        // console.log(isUserOfThisGroup)
+
+        if(!isUserOfThisGroup){
+            return next(new ApiError(401, USERERRORS.TASKS.NOTFOUND))
+        }
+
+        const tasksOfTheSingleGroup = await rawSqlExecquation(NATIVEQUERIES.TASKOFSINGLEGROUP ,[groupId])
+
+       console.log(tasksOfTheSingleGroup)
+
+       
+
+        res.status(200).json({
+            success: true,
+            message: "Single group data",
+            data: tasksOfTheSingleGroup
+        })
+
+
+    } catch (error) {
+        console.log("error in the getSingleGroupTask", error);
+        next(new ApiError(500, SERVER.INTERNALERROR))
+    }
+}
 
 
 
 
-module.exports = { createTask, deleteTask, updateTask, getAllTask, getsingleTask, updateTaskStatus, deleteTask, createGroup, groupTasks }
+
+module.exports = { createTask, deleteTask, updateTask, getAllTask, getsingleTask, updateTaskStatus, deleteTask, createGroup, groupTasks, getSingleGroupTask }

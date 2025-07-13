@@ -5,6 +5,7 @@ import { FaRegClock } from "react-icons/fa6";
 import { useSelector } from 'react-redux';
 import { useTaskContect } from '../contextApi/TaskContext';
 import { MdGroups3 } from "react-icons/md";
+import { toast } from 'react-toastify';
 
 
 
@@ -13,13 +14,13 @@ import { MdGroups3 } from "react-icons/md";
 
 const Projects = ({handleTaskCreation}) => {
    const { userDetails } = useSelector((state)=>state.user);
-   const { isGroup , setIsGruop,setTasks, setTeamm, teamm , recent, setRecent} = useTaskContect()
+   const { isGroup , setIsGruop,setTasks, setTeamm, teamm , recent, setRecent, setCurrentGroup, currentGroup} = useTaskContect()
    // console.log(isGroup)
 
     const handleTypes = (type)=>{
       console.log(type)
       if(userDetails.tier === "normal"){ 
-          alert("Please buy premium")
+          toast.info("Please buy premium")
           return
       }
       if(type === "team"){
@@ -27,14 +28,15 @@ const Projects = ({handleTaskCreation}) => {
       }else{
 
         setIsGruop(false)
+        setCurrentGroup(null)
       }
     }
 
-    console.log(teamm)
+    // console.log(teamm)
 
     useEffect(()=>{
       // console.log(userDetails.token);
-      console.log(isGroup);
+      // console.log(isGroup);
 
 
       (async ()=>{
@@ -47,10 +49,11 @@ const Projects = ({handleTaskCreation}) => {
         });
         const result = await data.json();
  
-        console.log(result);
+        // console.log(result);
 
         if(isGroup){
           setTeamm(result.data) 
+          setCurrentGroup(result?.data[0]?.id)
           setRecent([])
         }else{
           setRecent(result.data)
@@ -78,6 +81,48 @@ const Projects = ({handleTaskCreation}) => {
       })()
 
     },[isGroup])
+
+
+
+    const groupTasks = async ()=>{
+      try {
+
+        // console.log(currentGroup)
+        // console.log("-=0-0-=--0-0=-0")
+
+        const data = await fetch(`http://localhost:4000/api/v1/task/getSingleGroupTask/${currentGroup}`,{
+          method: "GET",
+          headers: {
+            "Content-Type":"application/json",
+            Authorization: userDetails.token
+          }
+        })
+
+        const result = await data.json();
+
+        // console.log(result)
+        setTasks(result.data)
+        
+      } catch (error) {
+        console.log("error in the groupTask to fetch the specific group task")
+      }
+    }
+
+
+
+    useEffect(()=>{
+
+      // console.log(currentGroup)
+
+      if(!currentGroup){
+        return
+      }
+      // console.log("heeehehehehehhe---------------------------------heheheheheh")
+
+       groupTasks()
+
+
+    },[currentGroup])
 
     // console.log(recent)
     // console.log(isGroup)
@@ -117,7 +162,9 @@ const Projects = ({handleTaskCreation}) => {
           {
           teamm.map((ele)=>{
               return (
-                <div key={ele.id} className='relative text-left w-[80%] text-white/60 bg-[#121315] mx-auto px-1 py-1 my-1 rounded-md cursor-pointer hover:text-gray-500/40 text-sm' >
+                <div key={ele.id} 
+                onClick={()=>setCurrentGroup(ele.id)}
+                className={`relative text-left w-[80%] ${currentGroup === ele.id && "bg-gray-700"}  text-white/60 bg-[#121315] mx-auto px-1 py-1 my-1 rounded-md cursor-pointer hover:text-gray-500/40 text-sm`} >
                   <p>{ele.groupName.length > 15 ? ele.groupName.slice(0,25)+".." : ele.groupName}</p>
                   <div className='border-gray-600 border-b-[1px] border-l-[1px]  h-4 w-4 absolute top-[30%] rounded-bl-md left-[-9%] translate-y-[-50%]'/>
                 </div>

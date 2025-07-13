@@ -18,7 +18,7 @@ const VerificationPage = () => {
 
             const result = await data.json()
 
-            console.log(result)
+            // console.log(result)
 
             if(result.success){
                 navigate("/login")
@@ -35,7 +35,7 @@ const VerificationPage = () => {
     }
 
     useEffect(()=>{
-      console.log(token )
+    //   console.log(token )
       handleverification()
     },[])
   return (

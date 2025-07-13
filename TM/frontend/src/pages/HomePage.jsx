@@ -5,14 +5,19 @@ import Projects from '../components/Projects'
 import { useSelector } from 'react-redux'
 import {  useTaskContect } from '../contextApi/TaskContext'
 import { GiCrossMark } from "react-icons/gi";
+import { useLocation } from 'react-router-dom';
+import { toast } from 'react-toastify'
+
 
 
 
 const HomePage = () => {
    const navigate = useNavigate()
+   const location = useLocation();
+   
+
   const { userDetails } = useSelector((state)=> state.user);
-  const [isPopUp, setIsPopUp ] = useState(false)
-  const { isGroup , setIsGruop  , tasks ,setTasks, recent, setRecent} = useTaskContect()
+  const { isGroup , setIsGruop , isPopUp, setIsPopUp  , tasks ,setTasks, recent, setRecent, setCurrentGroup, currentGroup, teamm, setTeamm } = useTaskContect()
   const [task, setTask ] = useState("")
   const [groupName, setgroupName] = useState("")
 
@@ -30,12 +35,17 @@ const HomePage = () => {
     }
 
   }
-  console.log("user in home ", userDetails)
+  // console.log("user in home ", userDetails)
 
   const handleTaskMaking = async ()=>{
     
+    if(isGroup && !newTeam && !currentGroup){
+            toast.error("Please provide a Group")
+            return
+    };
+
     const values = isGroup ? {
-      task, groupId:3
+      task, groupId:currentGroup
     } : {
       task
     }
@@ -52,15 +62,17 @@ const HomePage = () => {
 
       const result = await data.json();
 
-      console.log(result.data[0])
+      // console.log(result.data[0])
 
       if(result.success){
 
-        setRecent([...recent, result.data[0]])
+        setRecent([ result.data[0],...recent,])
         setTask("");
+        setTasks([result.data[0],...tasks])
         setIsPopUp(false)
+        toast.success("Created")
       }else{
-        alert(result.message)
+        toast.error(result.message)
       }
 
 
@@ -83,12 +95,16 @@ const HomePage = () => {
             const result = await data.json();
 
             if(!result.success){
-              alert(result.message)
+              toast.error(result.message)
               return
             }
-            alert("Group created successfully")
+            toast.success("Group created successfully")
 
-            setTasks([...tasks, ...result.data[0]])
+            // console.log(result)
+
+            setTeamm([ result.data[0],...teamm  ])
+            setCurrentGroup(result?.data[0]?.id)
+            setIsPopUp(false)
 
         } catch (error) {
           console.log("error in handle types in the group or task creation")
@@ -96,7 +112,7 @@ const HomePage = () => {
         
       }
 
-  console.log(newTeam)
+  // console.log(newTeam)
 
   useEffect(()=>{
      
@@ -107,17 +123,19 @@ const HomePage = () => {
   },[])
 
   return (
-    <div className='w-screen relative overflow-hidden h-screen max-w-[1500px] flex'>
+    <div className='w-screen relative overflow-hidden h-screen max-w-[2100px] mx-auto flex'>
       <div  className='h-full bg-[#292a2c] w-[67px]'>
         <SideBar />
      </div>   
     
      <div className='h-screen  custom_width overflow-hidden flex'>
-        <div className='flex-1/6 bg-[#1f2022]'>
-            <Projects handleTaskCreation={handleTaskCreation}/>
-        </div>
-       <div className='flex-5/6'>
-       <Outlet/>
+      {location.pathname === '/projects' && (
+            <div className="flex-1/6 bg-[#1f2022]">
+              <Projects handleTaskCreation={handleTaskCreation} />
+            </div>
+          )}
+       <div className='w-full'>
+       <Outlet />
        </div>
     </div> 
 
@@ -150,12 +168,12 @@ const HomePage = () => {
      </div>}
         {/* Textarea */}
        {newTeam ? <div>
-        <label className="block mb-2 text-white font-medium">Your Task</label>
+        <label className="block mb-2 text-white font-medium">Create New Team</label>
           <input
               type='text'
             value={groupName}
             onChange={(e) => setgroupName(e.target.value)}
-            placeholder="Write your task here...."
+            placeholder="Enter Team name...."
             className="bg-white/10  w-full p-3 text-white/80 outline-none resize-none rounded-md border border-white/10 focus:ring-2 focus:ring-amber-400"
           />
        </div> :<div>

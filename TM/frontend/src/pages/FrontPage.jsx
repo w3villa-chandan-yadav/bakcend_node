@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { FaPen } from "react-icons/fa6";
 import { MdAdd } from "react-icons/md";
 import { HiMiniUserGroup } from "react-icons/hi2";
@@ -6,6 +6,9 @@ import { FaUserAstronaut } from "react-icons/fa";
 import { useSelector } from 'react-redux';
 import { useTaskContect } from '../contextApi/TaskContext';
 import { FaEdit } from "react-icons/fa";
+import InviteComponent from '../components/PopupMoodal';
+import { toast } from 'react-toastify';
+
 
 
 
@@ -22,7 +25,7 @@ const FrontPage = () => {
 
   const { isGroup , setIsGruop, setTasks, tasks }  = useTaskContect()
   
-  console.log(tasks)
+  // console.log(tasks)
 
   // const [render, setRerender] = useState(false)
   const [start, setStart]  =useState([]);
@@ -32,7 +35,7 @@ const FrontPage = () => {
   // start","ongoing","completed"
 
 
-  console.log(start)
+  // console.log(start)
 
 
   const { userDetails } = useSelector((state)=> state.user)
@@ -51,14 +54,14 @@ const FrontPage = () => {
     })
     const result = await updateTaskstatus.json();
     if(!result.success){
-        alert(result.message)
+        toast.error(result.message)
          return
     }
     const [newTask] =  tasks.filter((ele)=>{
       return ele.id === id
     })
     newTask.status = status
-    console.log(tasks)
+    // console.log(tasks)
     // setRerender((pre)=> !pre)
     setTasks([...tasks])
   }
@@ -76,7 +79,7 @@ const FrontPage = () => {
     })
     const result = await updateTaskstatus.json();
     if(!result.success){
-        alert(result.message)
+        toast.error(result.message)
          return
     }
     const newTask =  tasks.filter((ele)=>{
@@ -90,7 +93,7 @@ const FrontPage = () => {
 
   useEffect(()=>{
     setStart(tasks.filter((ele)=>{
-      console.log(ele.status)
+      // console.log(ele.status)
       return ele.status === "start"
     })  )
 
@@ -113,8 +116,9 @@ const FrontPage = () => {
           {isGroup ? <span className=''> {"group Name"} </span>: <p>Task Name</p> } <FaPen className='text-[15px] pb-1'/>
         </h2>
 
-        <div className='mt-4'>
-        {isGroup ? <div className='flex justify-between'> <HiMiniUserGroup className='text-4xl'/> <button className='px-2 py-2 rounded-sm text-[12px] tracking-tight bg-[#1c1d1f] border-[1px] border-gray-800 shadow-xs/15 shadow-gray-500 flex items-center gap-1 text-white'> <MdAdd/> Invite Member</button>  </div>: <div className='flex justify-between'> <FaUserAstronaut  className='text-4xl'/> <button className='px-2 py-2 rounded-sm text-[12px] tracking-tight bg-[#1c1d1f] border-[1px] border-gray-800 shadow-xs/15 shadow-gray-500 flex items-center gap-1 text-white'>Personal</button>  </div> } 
+        <div className='mt-4 '>
+        {/* {isGroup ? <div className='flex justify-between'> <HiMiniUserGroup className='text-4xl'/> <button className='px-2 py-2 rounded-sm text-[12px] tracking-tight bg-[#1c1d1f] border-[1px] border-gray-800 shadow-xs/15 shadow-gray-500 flex items-center gap-1 text-white'> <MdAdd/> Invite Member</button>  </div>: <div className='flex justify-between'> <FaUserAstronaut  className='text-4xl'/> <button className='px-2 py-2 rounded-sm text-[12px] tracking-tight bg-[#1c1d1f] border-[1px] border-gray-800 shadow-xs/15 shadow-gray-500 flex items-center gap-1 text-white'>Personal</button>  </div> }  */}
+         <InviteComponent isGroup={isGroup}/>
         </div>
       </div>
 
@@ -139,6 +143,8 @@ const FrontPage = () => {
 
 const KanbanColumn = ({ title, tasks,handleChangeTask, handleDeleteTask }) => {
 
+  const { isPopUp, setIsPopUp } = useTaskContect()
+
   const [isOpen, setIsopen] = useState(false)
   const [isOpenTask, setIsOpenTask ] = useState(false)
   const [dropDown, setDropDown] = useState(null)
@@ -146,15 +152,26 @@ const KanbanColumn = ({ title, tasks,handleChangeTask, handleDeleteTask }) => {
 
   const handleAddMore = (e)=>{
     e.preventDefault();
-
-    setIsopen(true)
+    // console.log("hitted")
+    // setIsopen(true)
+    setIsPopUp(true)
   }
+  
+  // const randonHeight = useCallback(()=>{
+  //   const height =  Math.round(Math.random() * 100)+90 ;
+  //   return height+"px"
+  // },[])
+
+
+  // for using in tailwind 
+  const heightClasses = ["h-[50px]", "h-[60px]", "h-[70px]", "h-[80px]", "h-[90px]"];
+const randomHeightClass = heightClasses[Math.floor(Math.random() * heightClasses.length)]
 
 
   return (
   <div className=' rounded-md p-1 flex-shrink-0 w-full' >
 
-   <div className=' w-full bg-[#292a2c]  rounded-sm px-3 py-2 mb-3 flex justify-between items-center'>
+   <div className=' w-full bg-[#292a2c] text-white/70 rounded-sm px-3 py-2 mb-3 flex justify-between items-center'>
   <h3 className='  font-[100] anton  '>{title}</h3>
   <span 
   onClick={(e)=>handleAddMore(e)}
@@ -170,7 +187,8 @@ const KanbanColumn = ({ title, tasks,handleChangeTask, handleDeleteTask }) => {
         onClick={()=>setIsOpenTask((pre)=>{
           return task.id === pre ? false : task.id 
         })}
-        className={`bg-[#26282c] relative p-3 rounded-md shadow-md ${isOpenTask === task.id ? "h-[250px] overflow-y-scroll hiddeScrollBar": "h-[140px] overflow-hidden"}`}>
+        style={{ height: isOpenTask === task.id ?  "250px" : "120px" }}
+        className={`bg-[#26282c] relative p-3 text-white/70 rounded-md shadow-md ${isOpenTask === task.id ? "overflow-y-scroll hiddeScrollBar": `overflow-hidden`}`}>
           {isOpenTask === task.id ?  task.task : `${task.task.slice(0,70)+"..."}`}
           <div 
           onClick={(e)=>{

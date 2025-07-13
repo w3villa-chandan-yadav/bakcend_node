@@ -13,9 +13,14 @@ export const TaskContextProvider = ({children})=>{
 
     const [recent, setRecent] = useState([]) 
 
+    const [ currentGroup, setCurrentGroup] = useState(null)
+      
+    const [isPopUp, setIsPopUp ] = useState(false)
+
+    const [notification, setNotifications] = useState(0)
 
 
-    const value = { isGroup , setIsGruop, setTasks, tasks, teamm, setTeamm, setRecent, recent}
+    const value = { isGroup , setIsGruop, isPopUp, setIsPopUp  ,setTasks, tasks, teamm, setTeamm, setRecent, recent, currentGroup, setCurrentGroup, notification, setNotifications}
 
     return <TaskContect.Provider value={ value }>
         {children}

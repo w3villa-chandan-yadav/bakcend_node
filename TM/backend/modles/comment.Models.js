@@ -5,6 +5,7 @@ const { taskModle } = require("./task.Models");
 const { emailModel } = require("./emailVerification.Model");
 const { groupModel } = require("./group.Model");
 const { participantModel } = require("./participants.Model");
+const { notificationModel } = require("./notification.Model");
 
 const commentModels = sequelize.define("comments",{
     id: {
@@ -39,7 +40,7 @@ const commentModels = sequelize.define("comments",{
 })
 
 // { alter: true }
-userModel.sync().then(()=>{
+userModel.sync({ alter: true }).then(()=>{
     console.log("userModel got synced")
 
     return groupModel.sync()
@@ -60,7 +61,12 @@ userModel.sync().then(()=>{
     return emailModel.sync()
 }).then(()=>{
     console.log("email sync successfully")
-}).catch((error)=>{
+
+    return notificationModel.sync()
+}).then(()=>{
+    console.log("Notification sync successfully")
+}
+).catch((error)=>{
     console.log("there is error in syncing userModle")
 })
 

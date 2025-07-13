@@ -7,7 +7,7 @@
 }
 
 .custom_width{
-  width: calc(100dvw - 77px);
+  width: calc(100dvw - 67px);
 }
 
 .custom_width::-webkit-scrollbar{
@@ -51,3 +51,14 @@
   }
 }
 
+
+
+/* .custom-toast {
+  min-height: 60px;
+  width: 300px;
+  font-size: 14px;
+  padding: 12px 16px;
+  background: #1f1f1f;
+  border-radius: 10px;
+  color: white;
+} */
